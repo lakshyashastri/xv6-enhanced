@@ -450,8 +450,6 @@ wait(uint64 addr)
   }
 }
 
-#ifdef PBS
-
 int getDynamPriority(struct proc *p) {
   
   int min_a;
@@ -492,8 +490,6 @@ int set_priority(int new_priority, int pid) {
   }
   return old_priority;
 }
-
-#endif
 
 // Per-CPU process scheduler.
 // Each CPU calls scheduler() after setting itself up.

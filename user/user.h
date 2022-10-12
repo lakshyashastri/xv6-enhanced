@@ -24,8 +24,9 @@ int sleep(int);
 int uptime(void);
 void trace(int);
 int waitx(int*, int* /*wtime*/, int* /*rtime*/);
+#ifdef PBS
 int set_priority(int, int);
-
+#endif
 // ulib.c
 int stat(const char*, struct stat*);
 char* strcpy(char*, const char*);
