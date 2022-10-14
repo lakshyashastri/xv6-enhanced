@@ -187,6 +187,30 @@ avg rtime= 41
 avg wtime= 48
 ***
 
+## LBS
+
+### CPU=3; nfork=10; io=5
+avg rtime = 41
+
+avg wtime = 127
+
+### CPU=3; nfork=10; io=0
+avg rtime = 82
+
+avg wtime = 187
+
+### CPU=1; nfork=10; io=5
+avg rtime = 42
+
+avg wtime = 125
+
+### CPU=1; nfork=10; io=0
+avg rtime = 84
+
+avg wtime = 185
+
+****
+
 ## PBS
 
 ### CPU=3; nfork=10; io=5
@@ -214,11 +238,5 @@ avg rtime= 40
 avg wtime= 47
 
 ***
-
-## LBS
-CPU=3; nfork=10; io=5
-avg rtime = 42
-
-avg wtime = 127
 
 Note: readtimes and writetimes are relatively high for Lottery based scheduling since xv6 was run using QEMU which was run on an Ubuntu virtual machine
