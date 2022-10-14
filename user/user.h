@@ -27,6 +27,10 @@ int waitx(int*, int* /*wtime*/, int* /*rtime*/);
 #ifdef PBS
 int set_priority(int, int);
 #endif
+#ifdef LBS
+int settickets(int number);
+#endif
+
 // ulib.c
 int stat(const char*, struct stat*);
 char* strcpy(char*, const char*);

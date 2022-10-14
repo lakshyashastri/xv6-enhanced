@@ -100,6 +100,7 @@ extern uint64 sys_mkdir(void);
 extern uint64 sys_close(void);
 extern uint64 sys_trace(void);
 extern uint64 sys_set_priority(void);
+extern uint64 sys_settickets(void);
 // An array mapping syscall numbers from syscall.h
 // to the function that handles the system call.
 static uint64 (*syscalls[])(void) = {
@@ -125,8 +126,9 @@ static uint64 (*syscalls[])(void) = {
     [SYS_mkdir] sys_mkdir,
     [SYS_close] sys_close,
     [SYS_trace] sys_trace,
-    [SYS_waitx] sys_waitx
-    ,[SYS_set_priority] sys_set_priority
+    [SYS_waitx] sys_waitx,
+    [SYS_set_priority] sys_set_priority,
+    [SYS_settickets] sys_settickets
 };
 
 struct syscallnames
@@ -160,6 +162,7 @@ static struct syscallnames syscallnames[] = {
     {.name = "close", .nargs = 1},
     {.name = "trace", .nargs = 1},
     {.name = "set_priority", .nargs = 2},
+    {.name = "settickets", .nargs = 1},
 };
 
 void syscall(void)

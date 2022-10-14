@@ -5,6 +5,7 @@
 #include "spinlock.h"
 #include "proc.h"
 #include "defs.h"
+// #include "user/grind.h"
 
 struct cpu cpus[NCPU];
 
@@ -150,6 +151,7 @@ found:
   p->ctime = ticks;
   p->priority = 60; //default priority
   p->frequency = 0; //default frequency
+  p -> tickets = 1; // init number of tickets
 
   return p;
 }
@@ -491,6 +493,57 @@ int set_priority(int new_priority, int pid) {
   return old_priority;
 }
 
+int settickets(int number) {
+  if (number < 0)
+    return 1;
+  struct proc *p = myproc();
+  acquire(&p -> lock);
+  p -> tickets = number;
+  release(&p -> lock);
+  return 0;
+}
+
+int
+do_rand2(unsigned long *ctx)
+{
+/*
+ * Compute x = (7^5 * x) mod (2^31 - 1)
+ * without overflowing 31 bits:
+ *      (2^31 - 1) = 127773 * (7^5) + 2836
+ * From "Random number generators: good ones are hard to find",
+ * Park and Miller, Communications of the ACM, vol. 31, no. 10,
+ * October 1988, p. 1195.
+ */
+    long hi, lo, x;
+
+    /* Transform to [1, 0x7ffffffe] range. */
+    x = (*ctx % 0x7ffffffe) + 1;
+    hi = x / 127773;
+    lo = x % 127773;
+    x = 16807 * lo - 2836 * hi;
+    if (x < 0)
+        x += 0x7fffffff;
+    /* Transform to [0, 0x7ffffffd] range. */
+    x--;
+    *ctx = x;
+    return (x);
+}
+
+// return random number between a and b (inclusive)
+unsigned long rand_next = 1;
+int randint(int a, int b) {
+  int res = do_rand2(&rand_next);
+  // rand_next += 1;
+
+  if (a > b) {
+    int temp = a;
+    a = b;
+    b = temp;
+  }
+
+  return (res % (b - a + 1)) + a;
+}
+
 // Per-CPU process scheduler.
 // Each CPU calls scheduler() after setting itself up.
 // Scheduler never returns.  It loops, doing:
@@ -557,7 +610,62 @@ scheduler(void)
     swtch(&c->context, &min_proc->context);
     c->proc = 0;
     release(&min_proc->lock);
-#endif 
+#endif
+
+#ifdef LBS
+  // // setup
+  int total_tickets = 0;
+  int pref_sum[NPROC];
+  int pref_ctr = 0;
+  for (p = proc; p < &proc[NPROC]; p++) {
+    acquire(&p -> lock);
+    if (p -> state != RUNNABLE) {
+      release(&p -> lock);
+      continue;
+    }
+    total_tickets += p -> tickets;
+    
+    if (pref_ctr)
+      pref_sum[pref_ctr] = p -> tickets + pref_sum[pref_ctr - 1];
+    else
+      pref_sum[pref_ctr] = p -> tickets;
+
+    pref_ctr += 1;
+    release(&p -> lock);
+  }
+
+  if (!pref_ctr)
+    continue;
+
+  // choose winner
+  int winning_num = randint(1, total_tickets);
+  int winning_proc_index = 0; // if there is only one process, its always chosen
+  for (int i = 0; i < pref_ctr; i++) {
+    if (i) {
+      if (winning_num > pref_sum[i - 1] && winning_num <= pref_sum[i]) {
+        winning_proc_index = i;
+        break;
+      }
+    } else {
+      if (winning_num > 0 && winning_num <= pref_sum[i]) {
+        winning_proc_index = i;
+        break;
+      }
+    }
+  }
+
+  // sched
+  struct proc *winning_proc = &proc[winning_proc_index];
+  if (winning_proc != 0) {
+    acquire(&winning_proc->lock);
+    winning_proc -> state = RUNNING;
+    c -> proc = winning_proc;
+    swtch(&c->context, &winning_proc->context);
+    c->proc = 0;
+    release(&winning_proc->lock);
+  }
+
+#endif
 
 #ifdef PBS
     struct proc *process = 0;
@@ -897,6 +1005,10 @@ procdump(void)
 #ifdef FCFS
     printf("\n PID: %d state: %s name: %s addedtime: %d", p->pid, state, p->name, p->ctime);    
 #endif    
+
+#ifdef LBS
+    printf("\n PID: %d state: %s name: %s tickets: %d", p->pid, state, p->name, p->ctime, p -> tickets);
+#endif
 
 #ifdef PBS
     printf("\n PID: %d state: %s name: %s priority: %d runtime:%d frequency:%d", p->pid, state, p->name, p->priority,p->rtime,p->frequency);
