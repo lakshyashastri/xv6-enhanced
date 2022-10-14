@@ -144,6 +144,7 @@ UPROGS=\
 	$U/_zombie\
 	$U/_strace\
 	$U/_schedulertest\
+	$U/_cowtest\
 
 fs.img: mkfs/mkfs README $(UPROGS)
 	mkfs/mkfs fs.img README $(UPROGS)
