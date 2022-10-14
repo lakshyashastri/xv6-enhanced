@@ -157,5 +157,5 @@ uint64 sys_sigreturn(void){
   *(p->trapframe) = *(p->tframe2);
 
   myproc()->is_sigalarm = 0;
-  return 0;
+  return p->trapframe->a0;
 }
