@@ -616,58 +616,58 @@ scheduler(void)
 #endif
 
 #ifdef LBS
-  // setup
+
   int total_tickets = 0;
-  int pref_sum[NPROC];
-  int pref_ctr = 0;
+  for (p = proc; p < &proc[NPROC]; p++) {
+      acquire(&p -> lock);
+      if (p->state == RUNNABLE) {
+        total_tickets += p->tickets;
+        // printf("%d ", p->tickets);
+      }
+      release(&p -> lock);
+  }
+
+  int winning_num = randint(1, total_tickets);
   for (p = proc; p < &proc[NPROC]; p++) {
     acquire(&p -> lock);
-    if (p -> state != RUNNABLE) {
-      release(&p -> lock);
-      // pref_ctr += 1;
-      continue;
+    if (p -> state == RUNNABLE) {
+      total_tickets += p -> tickets;
+      if (total_tickets >= winning_num) {
+        p -> state = RUNNING;
+        c -> proc = p;
+        swtch(&c->context, &p->context);
+        c->proc = 0;
+        release(&p -> lock);
+        break;
+      }
     }
-    total_tickets += p -> tickets;
-    
-    if (pref_ctr)
-      pref_sum[pref_ctr] = p -> tickets + pref_sum[pref_ctr - 1];
-    else
-      pref_sum[pref_ctr] = p -> tickets;
-
-    pref_ctr += 1;
     release(&p -> lock);
   }
 
-  if (!pref_ctr)
-    continue;
+  // if (!pref_ctr)
+  //   continue;
 
-  // choose winner
-  int winning_num = randint(1, total_tickets);
-  int winning_proc_index = 0; // if there is only one process, its always chosen
-  for (int i = 0; i < pref_ctr; i++) {
-    if (i) {
-      if (winning_num > pref_sum[i - 1] && winning_num <= pref_sum[i]) {
-        winning_proc_index = i;
-        break;
-      }
-    } else {
-      if (winning_num > 0 && winning_num <= pref_sum[i]) {
-        winning_proc_index = i;
-        break;
-      }
-    }
-  }
+  // // choose winner
+  // int winning_proc_index = 0; // if there is only one process, its always chosen
+  // for (int i = 0; i < pref_ctr; i++) {
+  //   if (i) {
+  //     if (winning_num > pref_sum[i - 1] && winning_num <= pref_sum[i]) {
+  //       winning_proc_index = i;
+  //       break;
+  //     }
+  //   } else {
+  //     if (winning_num > 0 && winning_num <= pref_sum[i]) {
+  //       winning_proc_index = i;
+  //       break;
+  //     }
+  //   }
+  // }
 
-  // sched
-  struct proc *winning_proc = &proc[winning_proc_index];
-  if (winning_proc != 0) {
-    acquire(&winning_proc->lock);
-    winning_proc -> state = RUNNING;
-    c -> proc = winning_proc;
-    swtch(&c->context, &winning_proc->context);
-    c->proc = 0;
-    release(&winning_proc->lock);
-  }
+  // // sched
+  // struct proc *winning_proc = &proc[winning_proc_index];
+  // if (winning_proc != 0) {
+    
+  // }
 
 #endif
 
