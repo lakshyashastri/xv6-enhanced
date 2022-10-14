@@ -92,10 +92,18 @@ void usertrap(void)
   if (killed(p))
     exit(-1);
 
-    // give up the CPU if this is a timer interrupt.
-#ifdef RR
-  if (which_dev == 2)
+  // give up the CPU if this is a timer interrupt.
+#if defined RR || defined LBS
+  if(which_dev == 2) {
+    p->ticks_rn += 1;
+    if (p->ticks_rn >= p->ticks && !p->is_sigalarm && p->ticks > 0) {
+      p->ticks_rn = 0;
+      p->is_sigalarm = 1;
+      *(p->tframe2) = *(p->trapframe);
+      p->trapframe->epc = p->handler;
+    }
     yield();
+  }
 #endif
   usertrapret();
 }
@@ -167,8 +175,8 @@ void kerneltrap()
   }
 
   // give up the CPU if this is a timer interrupt.
-#ifdef RR
-  if (which_dev == 2 && myproc() != 0 && myproc()->state == RUNNING)
+#if defined RR || defined LBS
+  if(which_dev == 2 && myproc() != 0 && myproc()->state == RUNNING)
     yield();
 #endif
 

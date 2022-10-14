@@ -104,14 +104,20 @@ struct proc {
   struct file *ofile[NOFILE];  // Open files
   struct inode *cwd;           // Current directory
   char name[16];               // Process name (debugging)
-  int maskbits;             // Mask bits for signal handling
-  int addedtime;            // Time when added to the process list
-  uint rtime;                   // How long the process ran for
-  int priority;             // Priority of the process
-  int frequency;            // Frequency of running of the process
-  uint waittime;                   // How long the process waited for
-  uint ctime;                   // When was the process created 
-  uint etime;                   // When did the process exited
 
+  int maskbits;                // Mask bits for signal handling
+  int addedtime;               // Time when added to the process list
+  uint rtime;                  // How long the process ran for
+  int priority;                // Priority of the process
+  int frequency;               // Frequency of running of the process
+  uint waittime;               // How long the process waited for
+  uint ctime;                  // When was the process created 
+  uint etime;                  // When did the process exited
+  uint tickets;                // Number of tickets allotted to the process
 
+  uint64 handler;
+  int is_sigalarm;
+  int ticks;
+  int ticks_rn;
+  struct trapframe *tframe2;
 };
