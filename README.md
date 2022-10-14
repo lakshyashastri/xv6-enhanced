@@ -139,7 +139,7 @@ b
 - ***For***
     ```py 
     CPU = 3
-    total processes = 10 
+    Total processes = 10 
     I/O processes = 0
     ```
     Results were as follows:
@@ -154,7 +154,7 @@ b
 - ***For***
     ```py 
     CPU = 3
-    total processes = 10 
+    Total processes = 10 
     I/O processes = 5
     ```
     Results were as follows:    
@@ -169,7 +169,7 @@ b
 - ***For***
     ```py 
     CPU = 1
-    total processes = 10 
+    Total processes = 10 
     I/O processes = 0
     ```
     Results were as follows:
@@ -185,7 +185,7 @@ b
 - ***For***
     ```py 
     CPU = 1
-    total processes = 10 
+    Total processes = 10 
     I/O processes = 5
     ```
     Results were as follows:    
@@ -202,7 +202,7 @@ b
 - ***For***
     ```py 
     CPU = 3
-    total processes = 10 
+    Total processes = 10 
     I/O processes = 0
     ```
     Results were as follows:
@@ -216,7 +216,7 @@ b
 - ***For***
     ```py 
     CPU = 3
-    total processes = 10 
+    Total processes = 10 
     I/O processes = 5
     ```
     Results were as follows:    
@@ -231,7 +231,7 @@ b
 - ***For***
     ```py 
     CPU = 1
-    total processes = 10 
+    Total processes = 10 
     I/O processes = 0
     ```
     Results were as follows:
@@ -245,7 +245,7 @@ b
 - ***For***
     ```py 
     CPU = 1
-    total processes = 10 
+    Total processes = 10 
     I/O processes = 5
     ```
     Results were as follows:    
@@ -262,7 +262,7 @@ b
 - ***For***
     ```py 
     CPU = 3
-    total processes = 10 
+    Total processes = 10 
     I/O processes = 5
     ```
     Results were as follows:    
@@ -276,7 +276,7 @@ b
 - ***For***
     ```py 
     CPU = 3
-    total processes = 10 
+    Total processes = 10 
     I/O processes = 0
     ```
     Results were as follows:
@@ -290,7 +290,7 @@ b
 - ***For***
     ```py 
     CPU = 1
-    total processes = 10 
+    Total processes = 10 
     I/O processes = 5
     ```
     Results were as follows:    
@@ -303,7 +303,7 @@ b
 - ***For***
     ```py 
     CPU = 1
-    total processes = 10 
+    Total processes = 10 
     I/O processes = 0
     ```
     Results were as follows:
@@ -320,7 +320,7 @@ b
 - ***For***
     ```py 
     CPU = 3
-    total processes = 10 
+    Total processes = 10 
     I/O processes = 5
     ```
     Results were as follows:    
@@ -333,7 +333,7 @@ b
 - ***For***
     ```py 
     CPU = 3
-    total processes = 10 
+    Total processes = 10 
     I/O processes = 0
     ```
     Results were as follows:
@@ -347,7 +347,7 @@ b
 - ***For***
     ```py 
     CPU = 1
-    total processes = 10 
+    Total processes = 10 
     I/O processes = 5
     ```
     Results were as follows:    
@@ -360,7 +360,7 @@ b
 - ***For***
     ```py 
     CPU = 1
-    total processes = 10 
+    Total processes = 10 
     I/O processes = 0
     ```
     Results were as follows:
