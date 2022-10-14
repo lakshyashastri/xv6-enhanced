@@ -29,7 +29,7 @@
 - ## Trace:
     - For the user-defined `strace` command, we first implement a system call *`trace`* , which will have the mask bits given as an input by the user.
     The input will be entered as:
-        ```c
+        ```xml
         strace <mask> <command>
         ```
     - The mask has the int value of the bits which will help us to get to know what sys calls we have to display, we compare it with the sys call number assigned to it in `syscall.h` and if the bit is set, we print the sys call name and the arguments passed to it. 
@@ -42,9 +42,9 @@
 
 ***
 - ## Sigalarm and sigreturn:
-    - Sigalarm is implemented as the `sigalarm(interval, handler)` system call, which periodically alerts a given process as it uses CPU time. The system calls are properly defined in all relevant files.
+    - Sigalarm is implemented as the `sigalarm(interval, handler)` system call, which periodically alerts a given process as it uses CPU `t`ime. The system calls are properly defined in all relevant files.
     - This is very useful in cases where a process needs to take periodic actions.
-    - After every `interval` CPU ticks, the kernel calls the `handler` function. The application will resume where it left off after `handler` returns.
+    - After every `interval` CPU `t`icks, the kernel calls the `handler` function. The application will resume where it left off after `handler` returns.
     - `handler` is a pointer to the function that is supposed to be called.
     - We create a copy of the process trapframe in order to store the registers after the handler function expires. The variables are initialized in `trap.c`
     - We reset the the relevant `struct proc` members when an alarm is outstanding, and we also expire the handling function in `trap.c`
@@ -55,7 +55,7 @@
 
 - ## FCFS scheduling:
     - This is a scheduling algorithm which can be given at the time of compilation of the xv6 kernel as:
-        ```
+        ```ini
         make qemu SCHEDULER=FCFS
         ```
     - The makefile will hence define the macro `SCHEDULER` as `FCFS` and we can use this macro in the code to implement the FCFS scheduling algorithm to distinguish between the different algorithms.
@@ -66,7 +66,7 @@
 
     - We track the time it was added and the creation time `ctime` which we will be given as the ticks when process is allocated in `allocproc()` in which we define in the proc struct and compare them to implement the FCFS algorithm.
 
-    - We use locks to make sure that the process is not allocated to more than one CPU at a time.
+    - We use locks to make sure that the process is not allocated to more than one CPU `a`t a time.
 
 ***
 
@@ -78,15 +78,15 @@
         ```
     - After the compiling the code as such, the macro `SCHEDULER` is defined by the makefile as `LBS`, which is used in the code to check which scheduling algorithm is to be used.
     - The `LBS` scheduling algorithm is implemented in `proc.c` and and the `scheduler()` function is modified to implement the `LBS` algorithm.
-    - Each process is allocated one ticket upon initialization, and it can request more tickets using the `settickets` system call (Even though this is not the best idea since it allows for easy exploitation of the CPU by any process.) 
+    - Each process is allocated one ticket upon initialization, and it can request more tickets using the `settickets` system call (Even though this is not the best idea since it allows for easy exploitation of the CPU `b`y any process.) 
     - Processes are scheduled according to the number of tickets they have. A process with more tickets is more likely to be scheduled.
     - Every time a process has to be scheduled, all tickets of all (runnable) processes is summed and the probability of a process with a given number of tickets is calculated with that value.
-    - We use locks to make sure that the process is not allocated to more than one CPU at a time.
+    - We use locks to make sure that the process is not allocated to more than one CPU `a`t a time.
 ***
 
 - ## PBS:
     - This is a scheduling algorithm which can be given at the time of compilation of the xv6 kernel as:
-        ```
+        ```ini
         make qemu SCHEDULER=PBS
         ```
     - The makefile will hence define the macro `SCHEDULER` as `PBS` and we can use this macro in the code to implement the PBS scheduling algorithm to distinguish between the different algorithms.
@@ -94,13 +94,13 @@
     - We add a new system call `set_priority` which will take the priority as an input and set the priority of the process to the given priority. And we also add the system call number in `syscall.h` and the function pointer in `syscall.c`, with 2 arguments and `syscall.h` for the system call to work.
 
     - We add a user command setpriority which will take the priority and pid as an input and call the system call `set_priority`. This will be given as follows:
-        ```
+        ```xml
         setpriority <priority> <pid>
         ```
     - The PBS scheduling algorithm is implemented in `proc.c` and and the `scheduler()` function is modified to implement the PBS algorithm.
 
     -  We create a new function `getDynamicPriority()` which will calculate the dynamic priority of the process and we will call this function in `scheduler()` to implement the PBS algorithm. We calculate niceness, then dynamic priority. The function is implemented as follows:
-        ```c
+        ```ini
             niceness=[(wait_time)/(wait_time + run_time)]*10;
             dynamic_priority=max(0,min(100,priority - niceness +5));
         ```
@@ -109,7 +109,7 @@
 
     - We handle the case of equal dynamic priority by checking which process had a lower frequency of context switches and we give the process with lower frequency of context switches a higher priority. We even further, handle the case of equal frequency by checking which process had an earlier creation time and we give the process with earlier creation time a higher priority.
 
-    - We use locks to make sure that the process is not allocated to more than one CPU at a time.
+    - We use locks to make sure that the process is not allocated to more than one CPU `a`t a time.
 
 ***
 
@@ -130,113 +130,246 @@ b
 
 - In this way we allocate a copy of page to only those children who need to modify them and not just read.
 
+***
+***
+
 # **Analysis**
 
-## Round Robin
-### CPU = 3; nfork = 10; io = 0
-avg rtime= 33
+## **Round Robin**
+- ***For***
+    ```py 
+    CPU = 3
+    total processes = 10 
+    I/O processes = 0
+    ```
+    Results were as follows:
 
-avg wtime= 95
+    ```ini
+    avg runtime = 33
+
+    avg waittime = 95
+    ```
 ***
 
-### CPU = 3; nfork = 10; io = 5
+- ***For***
+    ```py 
+    CPU = 3
+    total processes = 10 
+    I/O processes = 5
+    ```
+    Results were as follows:    
 
-avg rtime= 16
+    ```ini
+    avg runtime = 16
 
-avg wtime= 115
+    avg waittime = 115
+    ```
 ***
 
-### CPU=1; nfork =10; io=0
+- ***For***
+    ```py 
+    CPU = 1
+    total processes = 10 
+    I/O processes = 0
+    ```
+    Results were as follows:
 
-avg rtime= 33
 
-avg wtime= 95
+    ```ini
+    avg runtime = 33
+
+    avg waittime = 95
+    ```
 ***
 
-### CPU=1; nfork =10; io=5
+- ***For***
+    ```py 
+    CPU = 1
+    total processes = 10 
+    I/O processes = 5
+    ```
+    Results were as follows:    
 
-avg rtime= 16
+    ```ini
+    avg runtime = 16
 
-avg wtime= 115
+    avg waittime = 115
+    ```
 ***
+***
+## **First come first serve**
 
-## First come first served
+- ***For***
+    ```py 
+    CPU = 3
+    total processes = 10 
+    I/O processes = 0
+    ```
+    Results were as follows:
 
-### CPU=3; nfork =10; io=0
+    ```ini
+    avg runtime = 39
 
-avg rtime= 39
+    avg waittime = 47
+    ```
+***
+- ***For***
+    ```py 
+    CPU = 3
+    total processes = 10 
+    I/O processes = 5
+    ```
+    Results were as follows:    
 
-avg wtime= 47
 
-### CPU=3; nfork =10; io=5
+    ```ini
+    avg runtime = 39
 
-avg rtime= 39
+    avg waittime = 47
+    ```
+***
+- ***For***
+    ```py 
+    CPU = 1
+    total processes = 10 
+    I/O processes = 0
+    ```
+    Results were as follows:
 
-avg wtime= 47
+    ```ini
+    avg runtime = 41
 
-### CPU=1; nfork =10; io=0
+    avg waittime = 48
+    ```
+***
+- ***For***
+    ```py 
+    CPU = 1
+    total processes = 10 
+    I/O processes = 5
+    ```
+    Results were as follows:    
+    ```ini
+    avg runtime = 41
 
-avg rtime= 41
-
-avg wtime= 48
-
-### CPU=1; nfork =10; io=5
-
-avg rtime= 41
-
-avg wtime= 48
+    avg waittime = 48
+    ```
+    ***
 ***
 
 ## LBS
 
-### CPU=3; nfork=10; io=5
-avg rtime = 41
+- ***For***
+    ```py 
+    CPU = 3
+    total processes = 10 
+    I/O processes = 5
+    ```
+    Results were as follows:    
+    ```ini
+    avg runtime = 41
 
-avg wtime = 127
-
-### CPU=3; nfork=10; io=0
-avg rtime = 82
-
-avg wtime = 187
-
-### CPU=1; nfork=10; io=5
-avg rtime = 42
-
-avg wtime = 125
-
-### CPU=1; nfork=10; io=0
-avg rtime = 84
-
-avg wtime = 185
-
-****
-
-## PBS
-
-### CPU=3; nfork=10; io=5
-
-avg rtime= 20
-
-avg wtime= 108
-
-### CPU=3; nfork =10; IO=0
-
-avg rtime= 39
-
-avg wtime= 47
-
-### CPU=1; nfork=10; IO=5
-
-avg rtime=19
-
-avg wtime= 107
-
-### CPU=1; nfork =10; IO=0
- 
-avg rtime= 40
-
-avg wtime= 47
-
+    avg waittime = 127
+    ```
 ***
 
-Note: readtimes and writetimes are relatively high for Lottery based scheduling since xv6 was run using QEMU which was run on an Ubuntu virtual machine
+- ***For***
+    ```py 
+    CPU = 3
+    total processes = 10 
+    I/O processes = 0
+    ```
+    Results were as follows:
+
+    ```ini
+    avg runtime = 82
+
+    avg waittime = 187
+    ```
+***
+- ***For***
+    ```py 
+    CPU = 1
+    total processes = 10 
+    I/O processes = 5
+    ```
+    Results were as follows:    
+    ```ini
+    avg runtime = 42
+
+    avg waittime = 125
+    ```
+    ***
+- ***For***
+    ```py 
+    CPU = 1
+    total processes = 10 
+    I/O processes = 0
+    ```
+    Results were as follows:
+
+    ```ini
+    avg runtime = 84
+
+    avg waittime = 185
+    ```
+***
+***
+## PBS
+
+- ***For***
+    ```py 
+    CPU = 3
+    total processes = 10 
+    I/O processes = 5
+    ```
+    Results were as follows:    
+    ```ini
+    avg runtime = 20
+
+    avg waittime = 108
+    ```
+    ***
+- ***For***
+    ```py 
+    CPU = 3
+    total processes = 10 
+    I/O processes = 0
+    ```
+    Results were as follows:
+
+    ```ini
+    avg runtime = 39
+
+    avg waittime = 47
+    ```
+***
+- ***For***
+    ```py 
+    CPU = 1
+    total processes = 10 
+    I/O processes = 5
+    ```
+    Results were as follows:    
+    ```ini
+    avg runtime = 19
+
+    avg waittime = 107
+    ```
+    ***
+- ***For***
+    ```py 
+    CPU = 1
+    total processes = 10 
+    I/O processes = 0
+    ```
+    Results were as follows:
+    ```ini 
+    avg runtime = 40
+
+    avg waittime = 47
+    ```
+    ***
+***
+
+#### ***Note: readtimes and writetimes are relatively high for Lottery based scheduling since xv6 was run using QEMU which was run on an Ubuntu virtual machine***
