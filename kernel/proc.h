@@ -115,4 +115,9 @@ struct proc {
   uint etime;                  // When did the process exited
   uint tickets;                // Number of tickets allotted to the process
 
+  uint64 handler;
+  int is_sigalarm;
+  int ticks;
+  int ticks_rn;
+  struct trapframe *tframe2;
 };

@@ -129,3 +129,33 @@ uint64 sys_settickets(void) {
   argint(0, &number);
   return settickets(number);
 }
+
+uint64 sys_sigalarm(void){
+  struct proc *p = myproc();
+
+  int ticks;
+  uint64 handler;
+
+  argint(0, &ticks);
+  argaddr(1, &handler);
+
+  p->is_sigalarm =0;
+  p->ticks = ticks;
+  p->ticks_rn = 0;
+  p->handler = handler;
+
+  return 0; 
+}
+
+uint64 sys_sigreturn(void){
+  struct proc *p = myproc();
+
+  p->tframe2->kernel_satp = p->trapframe->kernel_satp;
+  p->tframe2->kernel_sp = p->trapframe->kernel_sp;
+  p->tframe2->kernel_trap = p->trapframe->kernel_trap;
+  p->tframe2->kernel_hartid = p->trapframe->kernel_hartid;
+  *(p->trapframe) = *(p->tframe2);
+
+  myproc()->is_sigalarm = 0;
+  return 0;
+}

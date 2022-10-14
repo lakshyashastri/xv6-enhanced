@@ -133,6 +133,12 @@ found:
     return 0;
   }
 
+  p->tframe2 = (struct trapframe *) kalloc();
+  if (p->tframe2 == 0) {
+    release(&p->lock);
+    return 0;
+  }
+
   // An empty user page table.
   p->pagetable = proc_pagetable(p);
   if(p->pagetable == 0){
@@ -151,7 +157,12 @@ found:
   p->ctime = ticks;
   p->priority = 60; //default priority
   p->frequency = 0; //default frequency
-  p -> tickets = 1; // init number of tickets
+  p->tickets = 1; // init number of tickets
+
+  p->is_sigalarm = 0;
+  p->ticks = 0;
+  p->ticks_rn = 0;
+  p->handler = 0;
 
   return p;
 }
@@ -164,6 +175,8 @@ freeproc(struct proc *p)
 {
   if(p->trapframe)
     kfree((void*)p->trapframe);
+  if(p->tframe2)
+    kfree((void*)p->tframe2);
   p->trapframe = 0;
   if(p->pagetable)
     proc_freepagetable(p->pagetable, p->sz);
@@ -628,6 +641,7 @@ scheduler(void)
   }
 
   int winning_num = randint(1, total_tickets);
+  total_tickets = 0;
   for (p = proc; p < &proc[NPROC]; p++) {
     acquire(&p -> lock);
     if (p -> state == RUNNABLE) {
