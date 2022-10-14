@@ -314,6 +314,9 @@ fork(void)
   //copy maskbits
   np->maskbits = p->maskbits;
 
+  // copy number of tickets
+  np->tickets = p->tickets;
+
   // copy saved user registers.
   *(np->trapframe) = *(p->trapframe);
 
@@ -613,7 +616,7 @@ scheduler(void)
 #endif
 
 #ifdef LBS
-  // // setup
+  // setup
   int total_tickets = 0;
   int pref_sum[NPROC];
   int pref_ctr = 0;
@@ -621,6 +624,7 @@ scheduler(void)
     acquire(&p -> lock);
     if (p -> state != RUNNABLE) {
       release(&p -> lock);
+      // pref_ctr += 1;
       continue;
     }
     total_tickets += p -> tickets;
